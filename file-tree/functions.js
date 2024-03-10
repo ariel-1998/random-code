@@ -7,6 +7,10 @@ export function createNode(file) {
   let wrapper;
   if (file.type === "folder") wrapper = createFolderWrapper(file);
   if (file.id === "root") {
+    const addFolderBtn = createAddButton(file, "Add Folder", "folder");
+    const addFileBtn = createAddButton(file, "Add file", "file");
+    const btns = createBtnsWrapper(addFolderBtn, addFileBtn);
+    wrapper.append(btns);
     wrapper.append(div);
     return wrapper;
   }
@@ -108,6 +112,7 @@ function createInput(placeholder, parent, type) {
     if (value) createElementFromInputVal(parent, type, input);
     input.remove();
   });
+  matchElemToParentMargin(parent, input);
   parent.append(input);
   input.focus();
 }
@@ -133,7 +138,12 @@ function createElementFromInputVal(parent, type, input) {
   };
   if (type === " folder") fileObj.children = [];
   const node = createNode(fileObj);
-  const parentML = parent.style.marginLeft.replace("px", "");
-  node.style.marginLeft = `${+parentML + 10}px`;
+  matchElemToParentMargin(parent, node);
   parent.append(node);
+}
+
+function matchElemToParentMargin(parent, child) {
+  if (parent.id === "root") return;
+  const parentML = parent.style.marginLeft.replace("px", "");
+  child.style.marginLeft = `${+parentML + 10}px`;
 }
