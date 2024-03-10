@@ -1,3 +1,22 @@
-.id {
-  display: grid;
+#tree {
+  width: fit-content;
+}
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+}
+.btns-wrapper {
+  display: flex;
+}
+div {
+  width: fit-content;
+}
+
+.file,
+.folder {
+  cursor: pointer;
+}
+.hidden {
+  display: none;
 }

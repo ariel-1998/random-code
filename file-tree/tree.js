@@ -7,6 +7,11 @@ export const tree = {
   children: [
     {
       id: uuidV4(),
+      name: "file0.txt",
+      type: "file",
+    },
+    {
+      id: uuidV4(),
       name: "folder1",
       type: "folder",
       children: [

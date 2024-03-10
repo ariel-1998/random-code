@@ -4,10 +4,27 @@ export function uuidV4() {
 
 export function createNode(file) {
   const div = createDiv(file);
-  //   const icon = generateIcon(file);
-  const iconSpan = createIcon(file);
+  let wrapper;
+  if (file.type === "folder") wrapper = createFolderWrapper(file);
+  if (file.id === "root") {
+    wrapper.append(div);
+    return wrapper;
+  }
+  const icon = createIcon(file);
   const nameSpan = createSpan(file.name);
-  div.append(iconSpan, nameSpan);
+  let btns;
+  const deleteButton = createDeleteButton(file);
+  if (file.type === "folder") {
+    const addFolderBtn = createAddButton(file, "Add Folder", "folder");
+    const addFileBtn = createAddButton(file, "Add file", "file");
+    btns = createBtnsWrapper(deleteButton, addFolderBtn, addFileBtn);
+  }
+  div.append(icon, nameSpan);
+  if (wrapper) {
+    div.append(btns);
+    wrapper.append(div);
+    return wrapper;
+  } else div.append(deleteButton);
   return div;
 }
 
@@ -19,8 +36,21 @@ function createSpan(str) {
 
 function createDiv(file) {
   const div = document.createElement("div");
+  if (file.type === "file") div.id = file.id;
+  if (file.id === "root") return div;
   div.classList.add(file.type);
-  div.id = file.id;
+  div.addEventListener("click", (e) => {
+    e.stopPropagation();
+    if (file.type === "folder") {
+      Array.from(div.parentElement.children).forEach((child, i) => {
+        if (i === 0) return;
+        child.classList.toggle("hidden");
+      });
+    } else if (file.type) {
+      const fileName = div.firstElementChild.nextElementSibling.textContent;
+      alert(`clicked on ${fileName}`);
+    }
+  });
   return div;
 }
 
@@ -34,4 +64,76 @@ function createIcon(file) {
     icon = folderTemplate.content.cloneNode(true);
   }
   return icon;
+}
+
+function createButton(content) {
+  const button = document.createElement("button");
+  button.textContent = content;
+  return button;
+}
+
+function createDeleteButton(file) {
+  const button = createButton("delete");
+  button.addEventListener("click", (e) => {
+    e.stopPropagation();
+    const element = document.getElementById(file.id);
+    element.remove();
+  });
+  return button;
+}
+
+function createAddButton(file, placeholder, type) {
+  const button = createButton(placeholder);
+  button.addEventListener("click", (e) => {
+    e.stopPropagation();
+    const element = document.getElementById(file.id);
+    const isInputOpen = element.querySelector("input");
+    if (!isInputOpen) {
+      createInput(placeholder, element, type);
+    }
+  });
+  return button;
+}
+
+function createInput(placeholder, parent, type) {
+  const input = document.createElement("input");
+  input.type = "text";
+  input.placeholder = placeholder;
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") input.blur();
+  });
+
+  input.addEventListener("blur", () => {
+    const value = input.value;
+    if (value) createElementFromInputVal(parent, type, input);
+    input.remove();
+  });
+  parent.append(input);
+  input.focus();
+}
+
+function createFolderWrapper(file) {
+  const div = document.createElement("div");
+  div.id = file.id;
+  div.classList.add("wrapper");
+  return div;
+}
+function createBtnsWrapper(...elements) {
+  const div = document.createElement("div");
+  div.classList.add("btns-wrapper");
+  div.append(...elements);
+  return div;
+}
+
+function createElementFromInputVal(parent, type, input) {
+  const fileObj = {
+    id: uuidV4(),
+    name: input.value,
+    type,
+  };
+  if (type === " folder") fileObj.children = [];
+  const node = createNode(fileObj);
+  const parentML = parent.style.marginLeft.replace("px", "");
+  node.style.marginLeft = `${+parentML + 10}px`;
+  parent.append(node);
 }
