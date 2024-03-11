@@ -32,11 +32,10 @@ export class LinkedList {
       output += `${current.value} -> `;
       current = current.next;
     }
-    return (output += "null");
+    return (output += null);
   }
 
   insertAtIndex(index, data) {
-    if (index < 0 || index >= this.length) return null;
     if (index === 0) return this.insertAtHead(data);
     const prevNode = this.getByIndex(index - 1);
     if (!prevNode) return null;
@@ -45,6 +44,7 @@ export class LinkedList {
   }
 
   removeHead() {
+    if (!this.head) return null;
     this.head = this.head.next;
     this.length--;
   }
